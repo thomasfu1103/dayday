@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>日々籤｜愛之籤</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;600;900&display=swap');
+
+        :root {
+            --bg-color: #dbd7d2;
+            --paper-color: #faf9f7;
+            --shrine-red: #b24545;
+            --ink-black: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--ink-black);
+            font-family: 'Noto Serif TC', serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .omikuji-strip {
+            background-color: var(--paper-color);
+            width: 90vw;
+            max-width: 330px;
+            height: 88vh;
+            max-height: 700px;
+            position: relative;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: slideUp 1.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .border-outer {
+            position: absolute;
+            inset: 0;
+            border: 6px solid var(--shrine-red);
+            pointer-events: none;
+        }
+
+        .border-inner {
+            position: absolute;
+            inset: 15px;
+            border: 2.5px solid var(--shrine-red);
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .vertical-content {
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            height: 100%;
+            width: 100%;
+            padding: 85px 60px 85px 170px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .rank {
+            font-size: 2.4rem;
+            color: var(--shrine-red);
+            font-weight: 900;
+            margin-left: 2rem;
+            margin-bottom: 2rem;
+            letter-spacing: 0.25em;
+        }
+
+        .text-body {
+            font-size: 1.05rem;
+            line-height: 2.6;
+            letter-spacing: 0.32em;
+            font-weight: 300;
+            max-width: 120px;
+            opacity: 0.95;
+        }
+
+        .bottom-tag,
+        .signature {
+            position: absolute;
+            bottom: 40px;
+            writing-mode: vertical-rl;
+            color: var(--shrine-red);
+            letter-spacing: 0.3em;
+            font-weight: 600;
+        }
+
+        .bottom-tag {
+            left: 40px;
+            font-size: 0.7rem;
+            opacity: 0.4;
+        }
+
+        .signature {
+            right: 40px;
+            font-size: 0.82rem;
+            opacity: 0.8;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(100px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 2vh;
+            font-size: 0.7rem;
+            color: #666;
+            letter-spacing: 0.15em;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="omikuji-strip">
+    <div class="border-outer"></div>
+    <div class="border-inner"></div>
+
+    <div class="vertical-content">
+        <div class="rank" id="rank">--</div>
+        <div class="text-body" id="content">正在感應...</div>
+    </div>
+
+    <div class="bottom-tag">愛之籤</div>
+    <div class="signature">日々籤</div>
+</div>
+
+<div class="hint" id="hint">重新整理頁面以求新籤</div>
+
+<script>
+    const data = {
+        openings: [
+            "遇見是種緣分，但在那之前，","在感情的長路中，我們都是旅人，",
+            "有些心動不需要驚天動地，","最好的感情並非刻意追逐，",
+            "在愛裡學會慢慢靠近，","當你願意安靜聆聽心的方向，"
+        ],
+        middles: [
+            "請先學會溫柔地擁抱那個不完美的自己。",
+            "你要相信，被珍惜的從來不是勉強。",
+            "讓彼此在適當的距離裡，自由地呼吸。",
+            "愛並非佔有，而是理解與尊重的累積。"
+        ],
+        closings: [
+            "當你準備好了，溫柔會如期而至。",
+            "平淡即是長久，安穩便是深情。",
+            "願你在愛人的同時，從未丟失過自己。",
+            "讓一切順其自然，便是最好的安排。"
+        ],
+        ranks: ["大吉","吉","中吉","小吉","末吉"]
+    };
+
+    const BLOCK_TEXT = "今日之籤已靜靜落定，請待明日再來。";
+
+    function getTaiwanDateKey() {
+        const now = new Date();
+        const utc8 = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+        return utc8.toISOString().slice(0, 10);
+    }
+
+    function generateFortune() {
+        const o = data.openings[Math.floor(Math.random() * data.openings.length)];
+        const m = data.middles[Math.floor(Math.random() * data.middles.length)];
+        const c = data.closings[Math.floor(Math.random() * data.closings.length)];
+        const r = data.ranks[Math.floor(Math.random() * data.ranks.length)];
+
+        document.getElementById('rank').innerText = r;
+        document.getElementById('content').innerText = o + m + c;
+    }
+
+    window.onload = () => {
+        const todayKey = getTaiwanDateKey();
+        const lastDraw = localStorage.getItem("omikuji-ki-date");
+
+        if (lastDraw === todayKey) {
+            document.getElementById('rank').innerText = "—";
+            document.getElementById('content').innerText = BLOCK_TEXT;
+            document.getElementById('hint').innerText = "每日 00:00（UTC+8）重置";
+        } else {
+            generateFortune();
+            localStorage.setItem("omikuji-ki-date", todayKey);
+        }
+    };
+</script>
+
+</body>
+</html>
